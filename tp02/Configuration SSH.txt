@@ -1,0 +1,15 @@
+hostname RT-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
+crypto key generate rsa 
+!
+end
+
+* répondre 1024 bits pour la création de la clé SSH

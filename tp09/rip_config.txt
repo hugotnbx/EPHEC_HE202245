@@ -1,0 +1,131 @@
+*** ISP ***
+
+enable
+!
+configure terminal
+!
+hostname ISP
+!
+interface GigabitEthernet0/0
+ip address 88.55.33.129 255.255.255.252
+no shutdown
+!
+interface Serial0/0/0
+ip address 88.55.33.1 255.255.255.252
+no shutdown
+!
+end
+!
+copy running-config startup-config
+
+
+*** Routeur-Haut ***
+
+enable
+!
+configure terminal
+!
+hostname Routeur-Haut
+!
+interface GigabitEthernet0/0
+ip address 192.168.0.5 255.255.255.252
+no shutdown
+ip nat inside
+!
+interface GigabitEthernet0/1
+ip address 192.168.0.9 255.255.255.252
+no shutdown
+ip nat inside
+!
+interface Serial0/0/0
+ip address 88.55.33.2 255.255.255.252
+no shutdown
+ip nat outside
+!
+ip nat inside source list 1 interface Serial0/0/0 overload
+!
+access-list 1 permit 192.168.0.0 0.0.255.255
+!
+ip route 0.0.0.0 0.0.0.0 Serial0/0/0
+!
+router rip
+version 2
+network 192.168.0.4
+network 192.168.0.8
+default-information originate
+!
+end
+!
+copy running-config startup-config
+
+
+*** Routeur-Gauche ***
+
+enable
+!
+configure terminal
+!
+hostname Routeur-Gauche
+!
+interface GigabitEthernet0/0
+ip address 192.168.0.6 255.255.255.252
+no shutdown
+!
+interface GigabitEthernet0/1
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+!
+interface FastEthernet0/1/0
+switchport mode access
+no shutdown
+!
+interface vlan1
+ip address 192.168.0.1 255.255.255.252
+no shutdown
+!
+router rip
+version 2
+network 192.168.0.0
+network 192.168.0.4
+network 192.168.10.0
+passive-interface GigabitEthernet0/1
+!
+end
+!
+copy running-config startup-config
+
+
+*** Routeur-Droite ***
+
+enable
+!
+configure terminal
+!
+hostname Routeur-Droite
+!
+interface GigabitEthernet0/0
+ip address 192.168.0.10 255.255.255.252
+no shutdown
+!
+interface GigabitEthernet0/1
+ip address 192.168.20.1 255.255.255.0
+no shutdown
+!
+interface FastEthernet0/1/0
+switchport mode access
+no shutdown
+!
+interface vlan1
+ip address 192.168.0.2 255.255.255.252
+no shutdown
+!
+router rip
+version 2
+network 192.168.0.0
+network 192.168.0.8
+network 192.168.20.0
+passive-interface GigabitEthernet0/1
+!
+end
+!
+copy running-config startup-config
