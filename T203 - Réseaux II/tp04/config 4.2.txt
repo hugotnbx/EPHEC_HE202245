@@ -1,0 +1,354 @@
+*** CSW-01 ***
+
+enable
+!
+configure terminal
+!
+hostname CSW-01
+!
+ip routing
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name IT
+!
+vlan 20
+name PROD
+!
+vlan 30
+name SERVER
+!
+interface GigabitEthernet1/0/24
+no switchport
+ip address 10.1.0.253 255.255.255.252
+!
+interface GigabitEthernet1/0/1
+switchport mode trunk
+!
+interface GigabitEthernet1/0/2
+switchport mode trunk
+!
+interface GigabitEthernet1/0/11
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.1.10.254 255.255.255.0
+!
+interface vlan 20
+ip address 10.1.20.254 255.255.255.0
+!
+interface vlan 30
+ip address 10.1.30.254 255.255.255.0
+!
+router rip
+version 2
+network 10.1.0.252
+passive-interface vlan 10
+passive-interface vlan 20
+passive-interface vlan 30
+!
+end
+!
+copy running-config startup-config
+
+*** SW-01 ***
+
+enable
+!
+configure terminal
+!
+hostname SW-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name IT
+!
+vlan 20
+name PROD
+!
+vlan 30
+name SERVER
+!
+interface FastEthernet0/1
+switchport access vlan 10
+switchport mode access
+!
+interface FastEthernet0/2
+switchport access vlan 20
+switchport mode access
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.1.10.241 255.255.255.0
+!
+ip default-gateway 10.1.10.254
+!
+end
+!
+copy running-config startup-config
+
+*** SW-02 ***
+
+enable
+!
+configure terminal
+!
+hostname SW-02
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name IT
+!
+vlan 20
+name PROD
+!
+vlan 30
+name SERVER
+!
+interface FastEthernet0/2
+switchport access vlan 20
+switchport mode access
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.1.10.242 255.255.255.0
+!
+ip default-gateway 10.1.10.254
+!
+end
+!
+copy running-config startup-config
+
+*** SW-09 ***
+
+enable
+!
+configure terminal
+!
+hostname SW-09
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name IT
+!
+vlan 20
+name PROD
+!
+vlan 30
+name SERVER
+!
+interface FastEthernet0/1
+switchport access vlan 30
+switchport mode access
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.1.10.240 255.255.255.0
+!
+ip default-gateway 10.1.10.254
+!
+end
+!
+copy running-config startup-config
+
+*** RT-01 ***
+
+enable
+!
+configure terminal
+!
+hostname RT-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+interface GigabitEthernet0/0
+ip address 10.1.0.254 255.255.255.252
+no shutdown
+!
+interface GigabitEthernet0/1
+ip address 20.0.0.200 255.255.255.0
+no shutdown
+!
+interface GigabitEthernet0/0/0
+ip address 172.31.255.1 255.255.255.252
+no shutdown
+!
+router rip
+version 2
+default-information originate
+network 10.1.0.252
+network 20.0.0.0
+network 172.31.255.0
+ip route 0.0.0.0 0.0.0.0 20.0.0.1
+!
+end
+!
+copy running-config startup-config
+
+*** RT-02 ***
+
+enable
+!
+configure terminal
+!
+hostname RT-02
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+interface GigabitEthernet0/0/0
+ip address 172.31.255.2 255.255.255.252
+no shutdown
+!
+interface GigabitEthernet0/0
+no ip address
+no shutdown
+!
+interface GigabitEthernet0/0.10
+encapsulation dot1Q 10
+ip address 10.2.10.254 255.255.255.0
+!
+interface GigabitEthernet0/0.20
+encapsulation dot1Q 20
+ip address 10.2.20.254 255.255.255.0
+!
+interface GigabitEthernet0/0.30
+encapsulation dot1Q 30
+ip address 10.2.30.254 255.255.255.0
+!
+router rip
+version 2
+network 172.31.255.0
+network 10.2.0.0
+passive-interface GigabitEthernet0/0.10
+passive-interface GigabitEthernet0/0.20
+passive-interface GigabitEthernet0/0.30
+!
+end
+!
+copy running-config startup-config
+
+*** SW-04 ***
+
+enable
+!
+configure terminal
+!
+hostname SW-04
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name IT
+!
+vlan 20
+name PROD
+!
+vlan 30
+name SERVER
+!
+interface FastEthernet0/1
+switchport access vlan 10
+switchport mode access
+!
+interface FastEthernet0/2
+switchport access vlan 20
+switchport mode access
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.2.10.244 255.255.255.0
+!
+ip default-gateway 10.2.10.254
+!
+end
+!
+copy running-config startup-config

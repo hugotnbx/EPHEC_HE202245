@@ -1,0 +1,24 @@
+*** ROUTEUR RT-01 ***
+
+enable
+!
+configure terminal
+!
+hostname RT-01
+!
+interface GigabitEthernet0/0/0
+ip address 10.1.0.254 255.255.255.0
+no shutdown
+!
+ip dhcp excluded-address 10.1.0.11
+ip dhcp excluded-address 10.1.0.241
+!
+ip dhcp pool v0
+network 10.1.0.0 255.255.255.0
+default-router 10.1.0.254
+dns-server 10.1.0.11
+domain-name formation.lab
+!
+end
+!
+copy running-config startup-config

@@ -1,0 +1,118 @@
+*** Switch0 ***
+
+enable
+!
+configure terminal
+!
+hostname Switch0
+!
+vlan 10
+name VLAN10
+!
+vlan 20
+name VLAN20
+! 
+vlan 30
+name VLAN30
+!
+interface FastEthernet0/1
+switchport mode access
+switchport access vlan 10
+!
+interface FastEthernet0/2
+switchport mode access
+switchport access vlan 20
+!
+interface FastEthernet0/3
+switchport mode access
+switchport access vlan 30
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+end
+!
+copy running-config startup-config
+
+
+*** R1 ***
+
+enable
+!
+configure terminal
+!
+hostname R1
+!
+username admin secret class
+!
+ip domain-name labo.labo
+!
+line vty 0 4
+ login local
+ transport input ssh
+ access-class PermitPrivate in
+!
+interface GigabitEthernet0/1
+no ip address
+no shutdown
+!
+interface GigabitEthernet0/1.10
+encapsulation dot1Q 10
+ip address 10.0.0.1 255.0.0.0
+ip nat inside
+!
+interface GigabitEthernet0/1.20
+encapsulation dot1Q 20
+ip address 172.16.0.1 255.240.0.0
+ip nat inside
+!
+interface GigabitEthernet0/1.30
+encapsulation dot1Q 30
+ip address 192.168.0.1 255.255.0.0
+ip nat inside
+!
+interface Serial0/0/0
+ip address 88.0.0.1 255.255.255.252
+no shutdown
+ip nat outside
+!
+ip route 0.0.0.0 0.0.0.0 Serial0/0/0
+!
+ip access-list standard PermitPrivate
+permit 10.0.0.0 0.255.255.255
+permit 172.16.0.0 0.15.255.255
+permit 192.168.0.0 0.0.255.255
+!
+ip nat inside source list PermitPrivate interface Serial0/0/0 overload
+!
+end
+!
+copy running-config startup-config
+
+
+*** ISP ***
+
+enable
+!
+configure terminal
+!
+hostname ISP
+!
+interface GigabitEthernet0/1
+ip address 88.0.0.5 255.255.255.252
+no shutdown
+!
+interface Serial0/0/1
+ip address 88.0.0.2 255.255.255.252
+no shutdown
+ip access-group RFC1918 in
+!
+ip access-list standard RFC1918
+deny 10.0.0.0 0.255.255.255
+deny 172.16.0.0 0.15.255.255
+deny 192.168.0.0 0.0.255.255
+permit any
+!
+end
+!
+copy running-config startup-config

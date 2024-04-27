@@ -1,0 +1,20 @@
+*** ROUTEUR R1 ***
+
+enable
+!
+configure terminal
+!
+hostname R1
+!
+interface GigabitEthernet0/0
+ip address 192.168.0.1 255.255.255.0
+no shutdown
+!
+interface GigabitEthernet0/1
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+ip helper-address 192.168.0.2
+!
+end
+!
+copy running-config startup-config

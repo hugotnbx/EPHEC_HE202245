@@ -1,0 +1,337 @@
+*** S1-RT-01 ***
+
+enable
+!
+configure terminal 
+!
+hostname S1-RT-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line console 0
+password cisco
+login
+!
+service password-encryption
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+transport input ssh
+access-class permit_it in
+!
+crypto key generate rsa
+1024 
+!
+interface G0/0/0
+ip address 200.0.0.100 255.255.255.0
+no shutdown
+ip nat outside
+!
+interface G0/0
+ip address 10.22.0.254 255.255.255.248
+no shutdown
+ip nat inside
+!
+interface G0/1
+no ip address
+no shutdown
+!
+interface G0/1.1
+encapsulation dot1Q 1
+ip address 172.22.1.254 255.255.255.0
+ip nat inside
+!
+interface G0/1.90
+encapsulation dot1Q 90
+ip address 172.22.90.254 255.255.255.0
+ip nat inside
+!
+interface G0/1.100
+encapsulation dot1Q 100
+ip address 172.22.100.254 255.255.255.0
+ip nat inside
+!
+router ospf 1
+network 10.22.0.248 0.0.0.7 area 0
+network 172.22.90.0 0.0.0.255 area 0
+network 172.22.100.0 0.0.0.255 area 0
+passive-interface G0/1.1
+passive-interface G0/1.90
+passive-interface G0/1.100
+default-information originate
+!
+ip route 0.0.0.0 0.0.0.0 200.0.0.254
+!
+ip access-list standard permit_it
+permit 10.22.100.0 0.0.0.255
+permit 172.22.100.0 0.0.0.255
+!
+ip nat inside source list 1 interface G0/0/0 overload
+!
+access-list 1 permit 10.22.100.0 0.0.0.255
+access-list 1 permit 172.22.100.0 0.0.0.255
+!
+end
+!
+copy running-config startup-config
+
+
+*** DMZ-SW-01 ***
+
+enable
+!
+configure terminal
+!
+hostname DMZ-SW-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line console 0
+password cisco
+login
+!
+service password-encryption
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+access-class permit_it in
+!
+crypto key generate rsa
+1024 
+!
+vlan 90
+name SERVER
+! 
+vlan 100
+name IT
+!
+interface FastEthernet0/1
+switchport mode access
+switchport access vlan 90
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 100
+ip address 172.22.100.241 255.255.255.0
+no shutdown
+!
+ip default-gateway 172.22.100.254
+!
+ip access-list standard permit_it
+permit 10.22.100.0 0.0.0.255
+permit 172.22.100.0 0.0.0.255
+!
+end
+!
+copy running-config startup-config
+
+
+*** S1-CSW-01 ***
+
+enable
+!
+configure terminal
+!
+hostname S1-CSW-01
+!
+ip routing
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line console 0
+password cisco
+login
+!
+service password-encryption
+!
+ip ssh version 2
+!
+line vty 0 4
+login local
+transport input ssh
+access-class permit_it in
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name PROD
+!
+vlan 90
+name SERVER
+!
+vlan 100
+name IT
+!
+interface GigabitEthernet1/0/24
+no switchport
+ip address 10.22.0.253 255.255.255.248
+!
+interface GigabitEthernet1/0/1
+switchport mode trunk
+!
+interface GigabitEthernet1/0/2
+switchport mode trunk
+!
+interface vlan 10
+ip address 10.22.10.254 255.255.255.0
+ip helper-address 10.22.90.11
+!
+interface vlan 90
+ip address 10.22.90.254 255.255.255.0
+!
+interface vlan 100
+ip address 10.22.100.254 255.255.255.0
+ip helper-address 10.22.90.11
+!
+router ospf 1
+network 10.22.1.0 0.0.0.255 area 0
+network 10.22.10.0 0.0.0.255 area 0
+network 10.22.90.0 0.0.0.255 area 0
+network 10.22.100.0 0.0.0.255 area 0
+network 10.22.0.248 0.0.0.7 area 0
+passive-interface vlan 10
+passive-interface vlan 90
+passive-interface vlan 100
+!
+ip access-list standard permit_it
+permit 10.22.100.0 0.0.0.255
+permit 172.22.100.0 0.0.0.255
+!
+end
+!
+copy running-config startup-config
+
+
+*** S1-SW-01 ***
+
+enable
+!
+configure terminal
+!
+hostname S1-SW-01
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line console 0
+password cisco
+login
+!
+service password-encryption
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+access-class permit_it in
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name PROD
+!
+vlan 90
+name SERVER
+!
+vlan 100
+name IT
+!
+interface FastEthernet0/1
+switchport mode access
+switchport access vlan 90
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 100
+ip address 10.22.100.241 255.255.255.0
+no shutdown
+!
+ip default-gateway 10.22.100.254
+!
+ip access-list standard permit_it
+permit 10.22.100.0 0.0.0.255
+permit 172.22.100.0 0.0.0.255
+!
+end
+!
+copy running-config startup-config
+
+
+*** S1-SW-02 ***
+
+enable
+!
+configure terminal
+!
+hostname S1-SW-02
+!
+username admin secret cisco
+!
+ip domain-name formation.lab
+!
+line console 0
+password cisco
+login
+!
+service password-encryption
+!
+ip ssh version 2
+!
+line vty 0 15
+login local
+transport input ssh
+access-class permit_it in
+!
+crypto key generate rsa
+1024 
+!
+vlan 10
+name PROD
+!
+vlan 90
+name SERVER
+!
+vlan 100
+name IT
+!
+interface FastEthernet0/1
+switchport mode access
+switchport access vlan 10
+!
+interface FastEthernet0/24
+switchport mode access
+switchport access vlan 100
+!
+interface GigabitEthernet0/1
+switchport mode trunk
+!
+interface vlan 100
+ip address 10.22.100.242 255.255.255.0
+no shutdown
+!
+ip default-gateway 10.22.100.254
+!
+ip access-list standard permit_it
+permit 10.22.100.0 0.0.0.255
+permit 172.22.100.0 0.0.0.255
+!
+end
+!
+copy running-config startup-config

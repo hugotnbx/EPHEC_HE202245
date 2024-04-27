@@ -1,0 +1,117 @@
+*** RESEAU GLOBAL ***
+
+195.167.142.0/25
+
+*** VLAN 3 ***
+
+62 IPs
+
+6 bits --> .0/26 --> .192
+
+*** VLAN 4 ***
+
+30 IPs 
+
+5 bits --> .64/27 --> .224
+
+*** VLAN 99 ***
+
+3 IPs
+
+2 bits --> .96/29 --> .248
+
+*** ROUTEUR 0 ***
+
+enable
+!
+configure terminal
+!
+hostname Routeur0
+!
+interface GigabitEthernet0/0
+no ip address
+no shutdown
+!
+interface GigabitEthernet0/0.3
+encapsulation dot1Q 3
+ip address 195.167.142.1 255.255.255.192
+!
+interface GigabitEthernet0/0.4
+encapsulation dot1Q 4
+ip address 195.167.142.65 255.255.255.224
+!
+interface GigabitEthernet0/0.99
+encapsulation dot1Q 99
+ip address 195.167.142.97 255.255.255.248
+!
+end
+!
+copy running-config startup-config
+
+*** SWITCH 0 ***
+
+enable
+!
+configure terminal
+!
+hostname Switch0
+!
+interface FastEthernet0/3
+switchport mode access
+switchport access vlan 3
+switchport port-security 
+switchport port-security mac-address sticky 
+!
+interface FastEthernet0/4
+switchport mode access
+switchport access vlan 4
+switchport port-security 
+switchport port-security mac-address sticky 
+!
+interface FastEthernet0/1
+switchport mode trunk
+!
+interface FastEthernet0/2
+switchport mode trunk
+!
+interface Vlan99
+ip address 195.167.142.98 255.255.255.248
+!
+ip default-gateway 195.167.142.97
+!
+end
+!
+copy running-config startup-config
+
+*** SWITCH 1 ***
+
+enable
+!
+configure terminal
+!
+hostname Switch1
+!
+interface FastEthernet0/3
+switchport mode access
+switchport access vlan 3
+switchport port-security 
+switchport port-security mac-address sticky 
+!
+interface FastEthernet0/4
+switchport mode access
+switchport access vlan 4
+switchport port-security 
+switchport port-security mac-address sticky 
+!
+interface FastEthernet0/2
+switchport mode trunk
+!
+interface Vlan99
+ip address 195.167.142.99 255.255.255.248
+!
+ip default-gateway 195.167.142.97
+!
+end
+!
+copy running-config startup-config
+

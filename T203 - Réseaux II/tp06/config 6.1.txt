@@ -1,0 +1,68 @@
+*** RG1 ***
+
+enable
+!
+configure terminal
+!
+hostname RG1
+!
+interface FastEthernet0/0
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+ip nat inside
+!
+interface FastEthernet0/1
+ip address 192.168.20.1 255.255.255.0
+no shutdown
+ip nat inside
+!
+interface Serial0/0/0
+ip address 85.201.100.1 255.255.255.252
+no shutdown
+ip nat outside
+!
+ip nat inside source list 1 interface Serial0/0/0 overload
+!
+access-list 1 permit 192.168.10.0 0.0.0.255
+access-list 1 permit 192.168.20.0 0.0.0.255
+!
+router rip
+version 2
+network 192.168.10.0
+network 192.168.20.0
+network 85.201.100.0
+!
+end
+!
+copy running-config startup-config
+
+*** RD1 ***
+
+enable
+!
+configure terminal
+!
+hostname RD1
+!
+interface FastEthernet0/0
+ip address 85.201.100.5 255.255.255.252
+no shutdown
+ip nat inside
+!
+interface Serial0/0/0
+ip address 85.201.100.2 255.255.255.252
+no shutdown
+ip nat outside
+!
+ip nat inside source list 1 interface Serial0/0/0 overload
+!
+access-list 1 permit 85.201.100.4 0.0.0.4
+!
+router rip
+version 2
+network 85.201.100.0
+network 85.201.100.4
+!
+end
+!
+copy running-config startup-config
